@@ -15,7 +15,6 @@ import {
   Dropdown,
   DropdownMenu,
   DropdownItem,
-  Chip,
   Pagination,
   Selection,
   ChipProps,

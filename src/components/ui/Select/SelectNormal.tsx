@@ -19,10 +19,7 @@ export default function SelectNormalComponent({
   placeholder,
   prop,
 }: Props) {
-
-
   
-
   return (
     <>
       <Select

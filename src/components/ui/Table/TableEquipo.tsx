@@ -32,12 +32,7 @@ import {
 //Extra
 import { capitalize } from "./Utils";
 /**/
-import ModalTicketComponent from "../Modal/ModalTicket";
-import { SocketContext } from "@/src/context/SocketContext";
-import { useSession } from "next-auth/react";
-import { Solicitud } from "@/src/interfaces/solicitud.interface";
-import ModalSolicitudComponent from "../Modal/ModalSolicitud";
-import ModalAtenderTicketComponent from "../Modal/ModalAtenderTicket";
+import ModalActualizarEquipoComponent from "../Modal/ModalActualizarEquipo";
 import { Equipo } from "@/src/interfaces/equipo.interface";
 
 /**/
@@ -53,12 +48,16 @@ const statusColorMap: Record<string, ChipProps["color"]> = {
   vacation: "warning",
 };
 
-const INITIAL_VISIBLE_COLUMNS = ["Marca", "Especificacion", "Gamma", "actions"];
+const INITIAL_VISIBLE_COLUMNS = ["Equipo", "equipo_imei", "Cliente", "Estado", "actions"];
+
 export const columnsSolicitud = [
-  { name: "Equipo", uid: "Marca", sortable: true },
-  { name: "Especificacion", uid: "Especificacion", sortable: true },
-  { name: "Gamma", uid: "Gamma", sortable: true },
-  { name: "ACTIONS", uid: "actions", sortable: true },
+  { name: "Equipo", uid: "Equipo", sortable: true },
+  { name: "Imei", uid: "equipo_imei", sortable: true },
+  { name: "Estado", uid: "Estado", sortable: true },
+  { name: "Area", uid: "Area", sortable: true },
+  { name: "Cliente", uid: "Cliente", sortable: true },
+  { name: "Asignado", uid: "id_entidad", sortable: true },
+  { name: "Actions", uid: "actions", sortable: true },
 ];
 interface Props {
   array: Equipo[];
@@ -104,8 +103,8 @@ export default function TableEquipoComponent({ array }: Props) {
             user.Modelo.toLowerCase().includes(lowerCaseFilterValue)) ||
           (user.Marca &&
             user.Marca.toLowerCase().includes(lowerCaseFilterValue)) ||
-          (user.CodCliente &&
-            user.CodCliente.toLowerCase().includes(lowerCaseFilterValue))
+          (user.Cliente &&
+            user.Cliente.toLowerCase().includes(lowerCaseFilterValue))
       );
     }
     if (
@@ -141,22 +140,19 @@ export default function TableEquipoComponent({ array }: Props) {
     const cellValue = user[columnKey as keyof Equipo];
 
     switch (columnKey) {
-      case "Marca":
-        return <p>{user.CodCliente + "-" + user.Marca + " " + user.Modelo}</p>;
+      case "Equipo":
+        return <p>{user.Marca + " " + user.Modelo}</p>;
       case "role":
         return (
           <div className="flex flex-col">
             <p className="text-bold text-small capitalize">{cellValue}</p>
-            <p className="text-bold text-tiny capitalize text-default-500">
-              {user.Especificacion}
-            </p>
+            <p className="text-bold text-tiny capitalize text-default-500"></p>
           </div>
         );
       case "status":
         return (
           <Chip
             className="capitalize border-none gap-1 text-default-600"
-            color={statusColorMap[user.Especificacion]}
             size="sm"
             variant="dot"
           >
@@ -164,7 +160,9 @@ export default function TableEquipoComponent({ array }: Props) {
           </Chip>
         );
       case "actions":
-        return <div className="relative flex items-center gap-2"></div>;
+        return <div className="relative flex items-center gap-2">
+          <ModalActualizarEquipoComponent imei={user.equipo_imei}/>
+        </div>;
       default:
         return cellValue;
     }
@@ -326,7 +324,6 @@ export default function TableEquipoComponent({ array }: Props) {
         }}
         classNames={classNames}
         selectedKeys={selectedKeys}
-        selectionMode="multiple"
         sortDescriptor={sortDescriptor}
         topContent={topContent}
         topContentPlacement="outside"
@@ -346,7 +343,7 @@ export default function TableEquipoComponent({ array }: Props) {
         </TableHeader>
         <TableBody emptyContent={"No users found"} items={sortedItems}>
           {(item: Equipo) => (
-            <TableRow key={item.IdEquipo}>
+            <TableRow key={item.id_equipo}>
               {(columnKey) => (
                 <TableCell>{renderCell(item, columnKey)}</TableCell>
               )}

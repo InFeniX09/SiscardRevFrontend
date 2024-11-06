@@ -24,7 +24,6 @@ import {
 import { NotificationsDropdown } from "./NotificationsDropdown";
 import { DarkModeSwitch } from "./DarkmodeSwitch";
 import DropdownComponent from "@/src/components/ui/Dropdown/Dropdown";
-import ModalChatComponent from "@/src/components/ui/Modal/ModalChat";
 import Link from "next/link";
 
 interface Props {

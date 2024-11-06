@@ -17,7 +17,6 @@ export default function TabConfiguracionesRecursosHumanos() {
   useEffect(() => {
     socket?.emit("listar-tablaempleado", "", (tablaempleado: any) => {
         setTablaEmpleado(tablaempleado)
-        console.log(tablaempleado)
     });
   }, []);
 

@@ -38,15 +38,7 @@ import {
 //Extra
 import { capitalize } from "./Utils";
 /**/
-import ModalTicketComponent from "../Modal/ModalTicket";
-import { SocketContext } from "@/src/context/SocketContext";
-import { useSession } from "next-auth/react";
-import { Solicitud } from "@/src/interfaces/solicitud.interface";
-import ModalSolicitudComponent from "../Modal/ModalSolicitud";
-import ModalAtenderTicketComponent from "../Modal/ModalAtenderTicket";
-import { Equipo } from "@/src/interfaces/equipo.interface";
 import ModalGestionEntidad from "../Modal/ModalCrearUsuario";
-import { TablaUsuario } from "@/src/interfaces/tablausuario";
 import { TablaMenuAsignado } from "@/src/interfaces/tablamenuasignado";
 
 /**/
@@ -74,7 +66,7 @@ export const columnsSolicitud = [
   { name: "Usuario", uid: "Usuario", sortable: true },
   { name: "Perfil", uid: "Perfil", sortable: true },
   { name: "Estado", uid: "Estado", sortable: true },
-  { name: "ACTIONS", uid: "actions", sortable: true },
+  { name: "Actions", uid: "actions", sortable: true },
 ];
 interface Props {
   array: TablaMenuAsignado[];

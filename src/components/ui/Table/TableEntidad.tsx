@@ -33,7 +33,6 @@ import { SocketContext } from "@/src/context/SocketContext";
 import { useSession } from "next-auth/react";
 import { Solicitud } from "@/src/interfaces/solicitud.interface";
 import ModalSolicitudComponent from "../Modal/ModalSolicitud";
-import ModalAtenderTicketComponent from "../Modal/ModalAtenderTicket";
 import { Equipo } from "@/src/interfaces/equipo.interface";
 
 /**/

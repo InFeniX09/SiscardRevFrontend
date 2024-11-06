@@ -50,7 +50,6 @@ export const Sidebar = ({
 
   useEffect(() => {
     if (status === "authenticated") {
-      console.log('d',session?.user)
       try {
         const dato = {
           Usuario_id: session?.user.IdUsuario,
@@ -58,8 +57,8 @@ export const Sidebar = ({
         };
         socket?.emit("listar-menuxusuarioxperfil", dato, (menuxusuario: any) => {
           setMenuItems(menuxusuario);
-          console.log("blon", menuxusuario);
         });
+
       } catch (error) {
         console.error("Error fetching menu data:", error);
       }
@@ -68,6 +67,7 @@ export const Sidebar = ({
 
   const renderMenuItems = () => {
     return menuItems.map((menuItem) => {
+
       switch (menuItem.TipoMenu_id) {
         case 1:
           return (
@@ -88,11 +88,11 @@ export const Sidebar = ({
         switch (menuItem.TipoMenu_id) {
           case 2:
             return (
-              <SidebarItem
+              <SidebarItem 
                 key={menuItem.IdMenu}
                 title={menuItem.Menu}
                 icon={menuItem.RutaImagen}
-                isActive={currentPath === menuItem.Ruta} // Define tu lógica para establecer la activación del elemento
+                isActive={currentPath === menuItem.Ruta}
                 href={menuItem.Ruta}
               />
             );

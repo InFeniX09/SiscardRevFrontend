@@ -7,6 +7,8 @@ const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
+
+
 export const getlistarAlmacenxAlbaranSalida = async () => {
   const response = await api.get("/logistica/listarAlmacenxAlbaranSalida");
   return response.data.Query3;
@@ -40,3 +42,29 @@ export const generarpdf = async (pdatos:any,pdetalle:any) => {
   }, { responseType: "arraybuffer" });
   return response.data;
 };
+
+/*export const getDescargarReporteSGA = async () => {
+  try {
+    const response = await fetch("http://localhost:3100/logistica/descargarReporteSGA", {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      },
+    });
+
+    // Verifica si la respuesta fue exitosa
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    // Obtén el blob de la respuesta
+    const blob = await response.blob();
+    console.log('Blob obtenido:', blob);
+
+    // Aquí puedes manejar el blob como desees, como crear un enlace de descarga
+    return blob; // Retorna el blob
+  } catch (error) {
+    console.error('Error al descargar el reporte SGA:', error);
+    throw error; // Opcional: re-lanza el error si necesitas manejarlo más arriba
+  }
+};*/

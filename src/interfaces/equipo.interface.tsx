@@ -1,9 +1,10 @@
 export interface Equipo {
-    IdEquipo:number,
+    id_equipo:number,
+    equipo_imei: string,
     Marca:string,
     Modelo:string,
-    CodCliente:string,
-    Especificacion:string,
-    Gamma:string,
-    Estado_id:string
+    Estado:string,
+    Area:string,
+    Cliente: string,
+    Entidad:string
 };

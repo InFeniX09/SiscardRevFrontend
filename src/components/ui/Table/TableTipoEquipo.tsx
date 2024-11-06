@@ -20,20 +20,13 @@ import {
   Pagination,
   Selection,
   ChipProps,
-  SortDescriptor,
-  Tooltip,
+  SortDescriptor
 } from "@nextui-org/react";
 //Iconos
-import { MagnifyingGlassIcon, TicketIcon, UserPlusIcon } from "@heroicons/react/24/solid";
+import { MagnifyingGlassIcon, TicketIcon } from "@heroicons/react/24/solid";
 //Extra
 import { capitalize } from "./Utils";
 /**/
-import ModalTicketComponent from "../Modal/ModalTicket";
-import { SocketContext } from "@/src/context/SocketContext";
-import { useSession } from "next-auth/react";
-import { Solicitud } from "@/src/interfaces/solicitud.interface";
-import ModalSolicitudComponent from "../Modal/ModalSolicitud";
-import ModalAtenderTicketComponent from "../Modal/ModalAtenderTicket";
 import { TipoEquipo } from "@/src/interfaces/tipoequipo.interface";
 /**/
 
@@ -110,7 +103,7 @@ export default function TableTipoEquipoComponent({ array }: Props) {
       Array.from(statusFilter).length !== statusOptions.length
     ) {
       filteredUsers = filteredUsers.filter((user) =>
-        Array.from(statusFilter).includes(user.Estado)
+        Array.from(statusFilter).includes(user.Estado_id)
       );
     }
 
@@ -342,7 +335,6 @@ export default function TableTipoEquipoComponent({ array }: Props) {
         }}
         classNames={classNames}
         selectedKeys={selectedKeys}
-        selectionMode="multiple"
         sortDescriptor={sortDescriptor}
         topContent={topContent}
         topContentPlacement="outside"

@@ -45,9 +45,3 @@ export const createTicket = async (
   });
   return response.data;
 };
-
-
-export const getlistarTicket = async () => {
-  const response = await api.get("/centro-atencion/listarTicket");
-  return response.data.Query3;
-};

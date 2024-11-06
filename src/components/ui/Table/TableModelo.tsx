@@ -34,6 +34,8 @@ import { capitalize } from "./Utils";
 /**/
 import ModalSolicitudComponent from "../Modal/ModalSolicitud";
 import { Modelo } from "@/src/interfaces";
+import ModalTicketComponent from "../Modal/ModalTicket";
+import ModalDescuentoComponent from "../Modal/ModalDescuentoEquipo";
 /**/
 
 const statusOptions = [
@@ -47,11 +49,12 @@ const statusColorMap: Record<string, ChipProps["color"]> = {
   vacation: "warning",
 };
 
-const INITIAL_VISIBLE_COLUMNS = ["TipoEquipo", "Marca", "Modelo"];
+const INITIAL_VISIBLE_COLUMNS = ["TipoEquipo", "Marca", "Modelo", "Descuento"];
 export const columnsSolicitud = [
   { name: "Tipo de Equipo", uid: "TipoEquipo", sortable: true },
   { name: "Marca", uid: "Marca", sortable: true },
   { name: "Modelo", uid: "Modelo", sortable: true },
+  { name: "Descuento", uid: "Descuento", sortable: true },
 ];
 interface Props {
   array: Modelo[];
@@ -105,7 +108,7 @@ export default function TableModeloComponent({ array }: Props) {
       Array.from(statusFilter).length !== statusOptions.length
     ) {
       filteredUsers = filteredUsers.filter((user) =>
-        Array.from(statusFilter).includes(user.Estado)
+        Array.from(statusFilter).includes(user.Estado_id)
       );
     }
 
@@ -166,8 +169,11 @@ export default function TableModeloComponent({ array }: Props) {
             {cellValue}
           </Chip>
         );
-      case "actions":
-        return <div className="relative flex items-center gap-2"></div>;
+
+        case "Descuento":
+          return(
+            <ModalDescuentoComponent idModelo={user.IdModelo} />
+          )
       default:
         return cellValue;
     }
@@ -328,7 +334,6 @@ export default function TableModeloComponent({ array }: Props) {
         }}
         classNames={classNames}
         selectedKeys={selectedKeys}
-        selectionMode="multiple"
         sortDescriptor={sortDescriptor}
         topContent={topContent}
         topContentPlacement="outside"

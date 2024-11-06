@@ -4,11 +4,16 @@ import React, { useContext, useEffect, useState } from "react";
 import { SocketContext } from "@/src/context/SocketContext";
 import TableUsuario from "../Table/TableUsuario";
 import TableMenuAsignado from "../Table/TableMenuAsignado";
+import TablePerfil from "../Table/TablePerfil";
+import TablePerfilUsuario from "../Table/TablePerfilUsuario"
+import { log } from "console";
 
 export default function TabGestionEntidad() {
   const { socket } = useContext(SocketContext);
   const [usuario, setUsuario] = useState([]);
   const [menuasignado, setMenuAsignado] = useState([]);
+  const [perfil, setPerfil] = useState([]);
+  const [usuarioxperfil, setUsuarioPerfil] = useState([]);
   const [selectedTab, setSelectedTab] = useState(0);
 
   useEffect(() => {
@@ -24,12 +29,25 @@ export default function TabGestionEntidad() {
         break;
       case 2:
         if (menuasignado!.length === 0) {
-          socket?.emit("listar-tablamenuasignado", "", (tablamenuasignado: any) => {
-            setMenuAsignado(tablamenuasignado);
-            console.log('e',tablamenuasignado)
-          });
+          socket?.emit(
+            "listar-tablamenuasignado",
+            "",
+            (tablamenuasignado: any) => {
+              setMenuAsignado(tablamenuasignado);
+            }
+          );
         } else {
         }
+        break;
+      case 3:
+        socket?.emit("listar-perfil", "", (tablaPerfil: any) => {
+          setPerfil(tablaPerfil);
+        });
+        break;
+      case 4:
+        socket?.emit('listar-usuarioxperfil', '', (tablaUsuarioPerfil:any) => {
+          setUsuarioPerfil(tablaUsuarioPerfil)
+        });
         break;
     }
   };
@@ -63,14 +81,14 @@ export default function TabGestionEntidad() {
           <Tab key="3" title="Perfil" className="text-white">
             <Card>
               <CardBody className="flex gap-4">
-                <TableMenuAsignado array={menuasignado} />
+                <TablePerfil array={perfil} />
               </CardBody>
             </Card>
           </Tab>
           <Tab key="4" title="Perfil y Usuario" className="text-white">
             <Card>
               <CardBody className="flex gap-4">
-                <TableMenuAsignado array={menuasignado} />
+                <TablePerfilUsuario array={usuarioxperfil} />
               </CardBody>
             </Card>
           </Tab>

@@ -1,8 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import { ChevronUpIcon } from "@heroicons/react/24/solid";
+import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import { Accordion, AccordionItem, Image } from "@nextui-org/react";
-import clsx from "clsx";
 import {
   Cog8ToothIcon,
   ComputerDesktopIcon,
@@ -13,6 +12,11 @@ import {
   TicketIcon,
   UsersIcon,
 } from "@heroicons/react/24/solid";
+import { IoMdSettings } from "react-icons/io";
+
+import Link from "next/link";
+import clsx from "clsx";
+import { usePathname } from "next/navigation";
 interface Item {
   name: string;
   url: string;
@@ -26,6 +30,7 @@ interface Props {
 }
 
 export const CollapseItems = ({ icon, items, title }: Props) => {
+  const currentPath = usePathname();
   const [open, setOpen] = useState(false);
   const getIconComponent = (iconText: string) => {
     // Agrega más casos según los iconos que puedas tener en tu base de datos
@@ -50,9 +55,9 @@ export const CollapseItems = ({ icon, items, title }: Props) => {
         return (
           <HandRaisedIcon className="h-6 w-6 text-[var(--color-neutral)] " />
         );
-      case "Cog8ToothIcon":
+      case "IoMdSettings":
         return (
-          <Cog8ToothIcon className="h-6 w-6 text-[var(--color-neutral)] " />
+          <IoMdSettings className="h-6 w-6 text-[var(--color-neutral)] " />
         );
       default:
         return null; // Si el icono no coincide con ninguno conocido, devuelve null
@@ -60,9 +65,9 @@ export const CollapseItems = ({ icon, items, title }: Props) => {
   };
   return (
     <div className="flex gap-4 h-full items-center cursor-pointer text-[0.8rem]">
-      <Accordion className="px-0">
+      <Accordion className='px-0'>
         <AccordionItem
-          indicator={<ChevronUpIcon className="h-5" color="black" />}
+          indicator={<ChevronDownIcon className="h-5" color="black" />}
           classNames={{
             indicator: "data-[open=true]:-rotate-180",
             trigger:
@@ -88,22 +93,23 @@ export const CollapseItems = ({ icon, items, title }: Props) => {
         >
           <div className="pl-7 flex flex-col gap-2">
             {items.map((item, index) => (
-                <a
-                  key={index}
-                  href={item.url}
-                  className="w-full flex text-default-500 hover:text-default-900 transition-colors gap-2"
-                >
-                  {getIconComponent(item.icon) || (
-                    <Image
-                      src=""
-                      alt={title}
-                      width={24}
-                      height={24}
-                      className="h-6 w-6"
-                    />
-                  )}
-                  {item.name}
-                </a>
+              //cuando item.uel sea igual a la currentpath que se mantenga activo
+              <Link
+                key={index}
+                href={item.url}
+                className={clsx("w-full flex text-default-500  gap-2 pl-2", item.url === currentPath ? "bg-[#E62532] bg-opacity-50  [&_svg_path]:fill-[#FFFFFF] border-opacity-70 border-1 border-white rounded-2xl text-white": "hover:text-default-900 transition-colors")}
+              >
+                {getIconComponent(item.icon) || (
+                  <Image
+                    src=""
+                    alt={title}
+                    width={24}
+                    height={24}
+                    className="h-6 w-6"
+                  />
+                )}
+                {item.name}
+              </Link>
             ))}
           </div>
         </AccordionItem>

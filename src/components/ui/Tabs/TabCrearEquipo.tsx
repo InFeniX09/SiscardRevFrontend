@@ -227,6 +227,8 @@ export default function TabCrearEquipo() {
     reset: resetEquipo,
   } = useForm();
   const actionEquipo = async (dato: any) => {
+    console.log("MARCA", selectmarca);
+    console.log(dato);
     const MySwal = withReactContent(Swal);
     MySwal.fire({
       title: "Crear nuevo Equipo?",
@@ -242,10 +244,11 @@ export default function TabCrearEquipo() {
         socket?.emit(
           "crear-equipo",
           {
-            Area: dato.Area,
-            Cliente: dato.Cliente,
-            Modelo: dato.Modelo,
-            Especificacion: dato.Especificacion,
+            Marca: selectmarca[0],
+            Modelo: dato.modelo,
+            Imei: dato.imei,
+            Area: dato.area,
+            Cliente: dato.cliente,
             Gamma: dato.Gamma,
           },
           (equipo: any) => {
@@ -407,7 +410,7 @@ export default function TabCrearEquipo() {
                   prop={{ ...rMarca(`Marca`) }}
                 />
                 <Button color="danger" onClick={fMarca(actionMarca)}>
-                Añadir
+                  Añadir
                 </Button>
               </form>
             </CardBody>
@@ -443,6 +446,24 @@ export default function TabCrearEquipo() {
                   icon1={"hidden"}
                   prop={{ ...rModelo(`Modelo`) }}
                 />
+
+                <InputComponent
+                  tipo="text"
+                  titulo="Cuotas"
+                  placeholder=""
+                  icon
+                  icon1={"hidden"}
+                  prop={{ ...rModelo(`Cuotas`) }}
+                />
+
+                <InputComponent
+                  tipo="text"
+                  titulo="Costo de la primera cuota"
+                  placeholder=""
+                  icon
+                  icon1={"hidden"}
+                  prop={{ ...rModelo(`Costo`) }}
+                />
                 <Button color="danger" onClick={fModelo(actionModelo)}>
                   Añadir
                 </Button>
@@ -454,22 +475,6 @@ export default function TabCrearEquipo() {
           <Card>
             <CardBody>
               <form className="flex justify-center items-center flex-col w-full gap-3">
-                <SelectNormalComponent
-                  array={area}
-                  value="IdArea"
-                  texts={["Area"]}
-                  label="Area"
-                  placeholder="Seleccionar un área"
-                  prop={{ ...rEquipo("Area") }}
-                />
-                <SelectNormalComponent
-                  array={cliente}
-                  value="IdCliente"
-                  texts={["CodCliente"]}
-                  label="Cliente"
-                  placeholder="Seleccionar un cliente"
-                  prop={{ ...rEquipo("Cliente") }}
-                />
                 <SelectStateComponent
                   array={tipoequipo}
                   index="IdTipoEquipo"
@@ -479,6 +484,7 @@ export default function TabCrearEquipo() {
                   value={selecttipoequipo}
                   onChange={setSelectTipoEquipo}
                 />
+
                 <SelectStateComponent
                   array={marcaxtipoequipo}
                   index="IdMarca"
@@ -494,12 +500,36 @@ export default function TabCrearEquipo() {
                   texts={["Modelo"]}
                   label="Modelo"
                   placeholder="Seleccione un Modelo"
-                  prop={{ ...rEquipo("Modelo") }}
+                  prop={{ ...rEquipo("modelo") }}
                 />
-                <TextAreaNormalComponent
-                  label="Especificación"
-                  prop={{ ...rEquipo("Especificacion") }}
+
+                <InputComponent
+                  tipo="text"
+                  titulo="IMEI"
+                  placeholder=""
+                  icon
+                  icon1={"hidden"}
+                  prop={{ ...rEquipo(`imei`) }}
                 />
+
+                <SelectNormalComponent
+                  array={area}
+                  value="IdArea"
+                  texts={["Area"]}
+                  label="Area"
+                  placeholder="Seleccionar un área"
+                  prop={{ ...rEquipo("area") }}
+                />
+
+                <SelectNormalComponent
+                  array={cliente}
+                  value="IdCliente"
+                  texts={["CodCliente"]}
+                  label="Cliente"
+                  placeholder="Seleccionar un cliente"
+                  prop={{ ...rEquipo("cliente") }}
+                />
+
                 <Select
                   label="Gamma"
                   className="w-full"
@@ -534,7 +564,6 @@ export default function TabCrearEquipo() {
               <h1>Escoger los precios en función al mes</h1>
               <br />
               <form className="flex flex-col justify-center items-center">
-     
                 <SelectStateComponent
                   array={area}
                   index="IdArea"
@@ -577,14 +606,16 @@ export default function TabCrearEquipo() {
                   {...rLogicaEquipoDescuento(`CMes`)}
                 />
                 <div className="flex gap-5 py-3">
-                  <Button color="danger"
+                  <Button
+                    color="danger"
                     onClick={fLogicaEquipoDescuento(
                       actionLogicaEquipoDescuento
                     )}
                   >
                     Iniciar
                   </Button>
-                  <Button color="danger"
+                  <Button
+                    color="danger"
                     onClick={() => {
                       remove();
                       setBtnGuardar(true);

@@ -4,9 +4,11 @@ import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
 import { SocketContext } from "@/src/context/SocketContext";
 import TableTicketComponent from "@/src/components/ui/Table/TableTicket";
 import TableSolicitudComponent from "@/src/components/ui/Table/TableSolicitud";
+import TableTodasSolicitudesComponent from "@/src/components/ui/Table/TableTodasSolicitudes";
 import { useSession } from "next-auth/react";
 import { Menu } from "@/src/interfaces";
 import Loading from "../Loading/Loading";
+import TableTodosTicketsComponent from "../Table/TableTodosTickets";
 
 export default function TabCentroAtencion() {
   const { socket } = useContext(SocketContext);
@@ -15,25 +17,58 @@ export default function TabCentroAtencion() {
   const [dataticket, setDataTicket] = useState([]);
   const [datatodossolicitud, setDataTodosSolicitud] = useState([]);
   const [datatodosticket, setDataTodosTicket] = useState([]);
+  const [datatodosticketResponsable, setDataTodosTicketResponsable] = useState(
+    []
+  );
   const [menuItems, setMenuItems] = useState<Menu[]>([]);
-  const [menuLoaded, setMenuLoaded] = useState(false); // Estado para indicar si los datos del menú están cargados
-
-  const [selectedTab, setSelectedTab] = useState(0); // Estado para el índice de la pestaña seleccionada
+  const [menuLoaded, setMenuLoaded] = useState(false);
+  const [selectedTab, setSelectedTab] = useState(0);
 
   useEffect(() => {
-
-      // Verifica si session está definido
+    if (status === "authenticated") {
       const quesada = session?.user.IdUsuario;
-
       const data = {
         Usuario_id: quesada,
       };
 
+      //sacar el AREA ID
+      socket?.emit("area-id-usuario", quesada, (areaResponse: any) => {
+        localStorage.setItem("area",areaResponse)
+      });
+
+      // Emitir el evento listar-misolicitud para obtener los datos iniciales
       socket?.emit("listar-misolicitud", data, (asignados: any) => {
         setSolicitud(asignados);
       });
 
-  }, []);
+      // Escuchar el evento nueva-solicitud
+      socket?.on("nueva-solicitud", () => {
+        socket?.emit("listar-misolicitud", data, (asignados: any) => {
+          setSolicitud(asignados);
+        });
+      });
+
+      socket?.on("nuevo-ticket", () => {
+        socket?.emit("listar-miticket", data, (ticket: any) => {
+          setDataTicket(ticket);
+        });
+      });
+
+      socket?.on("ticket-aceptado", () => {
+        let area = localStorage.getItem("area");
+        socket?.emit("listar-ticket", area, (ticket: any) => {
+          setDataTodosTicket(ticket);
+        });
+      });
+    }
+
+    return () => {
+      // Cleanup para evitar fugas de memoria
+      socket?.off("nueva-solicitud");
+      socket?.off("nuevo-ticket");
+      socket?.off("ticket-aceptado");
+    };
+  }, [status, socket, session?.user.IdUsuario]);
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -54,7 +89,7 @@ export default function TabCentroAtencion() {
         console.error("Error fetching menu data:", error);
       }
     }
-  }, [status]);
+  }, [status, session?.user.IdUsuario, socket]);
 
   const handleTabChange = (key: any) => {
     setSelectedTab(key.toString());
@@ -70,7 +105,6 @@ export default function TabCentroAtencion() {
           socket?.emit("listar-miticket", data, (ticket: any) => {
             setDataTicket(ticket);
           });
-        } else {
         }
         break;
       case 3:
@@ -81,31 +115,40 @@ export default function TabCentroAtencion() {
           socket?.emit("listar-solicitud", data, (solicitudtodos: any) => {
             setDataTodosSolicitud(solicitudtodos);
           });
-        } else {
         }
         break;
       case 4:
+        let area = localStorage.getItem("area");
         if (datatodosticket.length === 0) {
-          const data = {
-            Usuario_id: undefined,
-          };
-          socket?.emit("listar-ticket", data, (ticket: any) => {
+          socket?.emit("listar-ticket", area, (ticket: any) => {
             setDataTodosTicket(ticket);
           });
-        } else {
         }
+        break;
+
+      case 5:
+        let idResponsable = session?.user.IdUsuario;
+        socket?.emit(
+          "listar-ticket-responsable",
+          idResponsable,
+          (ticketResponsable: any) => {
+            setDataTodosTicketResponsable(ticketResponsable);
+          }
+        );
+
         break;
     }
   };
+
   const tabs = [
-    <Tab key="1" title="Mis Solicitudes">
+    <Tab key="1" title="MIS SOLICITUDES">
       <Card>
         <CardBody>
-          <TableSolicitudComponent array={datasolicitud} atender="no"/>
+          <TableSolicitudComponent array={datasolicitud} atender="no" />
         </CardBody>
       </Card>
     </Tab>,
-    <Tab key="2" title="Mis Tickets">
+    <Tab key="2" title="MIS TICKETS">
       <Card>
         <CardBody>
           <TableTicketComponent array={dataticket} atender="no" />
@@ -113,33 +156,47 @@ export default function TabCentroAtencion() {
       </Card>
     </Tab>,
   ];
-  if (menuItems.some((item) => item.IdMenu === 7 )) {
+
+  if (menuItems.some((item) => item.IdMenu === 7)) {
     tabs.push(
-      <Tab key="3" title="Atender Solicitudes">
+      <Tab key="3" title="TODAS SOLICITUDES">
         <Card>
           <CardBody>
-            <TableSolicitudComponent array={datatodossolicitud} atender="si"/>
-          </CardBody>
-        </Card>
-      </Tab>,
-      <Tab key="4" title="Atender Tickets">
-        <Card>
-          <CardBody>
-            <TableTicketComponent array={datatodosticket} atender="si"/>
+            <TableTodasSolicitudesComponent array={datatodossolicitud} />
           </CardBody>
         </Card>
       </Tab>
     );
   }
 
+  tabs.push(
+    <Tab key="4" title="TODOS TICKETS (AREA)">
+      <Card>
+        <CardBody>
+          <TableTodosTicketsComponent array={datatodosticket} />
+        </CardBody>
+      </Card>
+    </Tab>,
+    <Tab key="5" title="TICKETS POR RESPONSABLE">
+      <Card>
+        <CardBody>
+          <TableTicketComponent
+            array={datatodosticketResponsable}
+            atender="si"
+          />
+        </CardBody>
+      </Card>
+    </Tab>
+  );
+
   return (
     <div className="flex w-full flex-col">
-     {menuLoaded ? (
+      {menuLoaded ? (
         <Tabs
-        classNames={{
-          cursor: "bg-[var(--color-peru)]",
-          tabList: "bg-white",
-        }}
+          classNames={{
+            cursor: "bg-[var(--color-peru)]",
+            tabList: "bg-white",
+          }}
           color="danger"
           aria-label="Options"
           selectedKey={selectedTab}
@@ -148,7 +205,7 @@ export default function TabCentroAtencion() {
           {tabs}
         </Tabs>
       ) : (
-       <Loading/>
+        <Loading />
       )}
     </div>
   );

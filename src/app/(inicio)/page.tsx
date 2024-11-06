@@ -15,7 +15,6 @@ export default function Home({ searchParams }: Props) {
   return (
     <>
       <section className="bg-[image:url(/inicio/inicioperu.png)] h-screen w-full bg-cover bg-center bg-no-repeat py-20 px-10 flex flex-col justify-between items-center">
-        <div></div>
         <div className="flex flex-col items-center gap-3 text-white">
           <h4 className="text-2xl tracking-wider text-shadow">BIENVENIDO A</h4>
           <h1 className="text-4xl tracking-wide text-shadow">SISCARD PERÚ</h1>

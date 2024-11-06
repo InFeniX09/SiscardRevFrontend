@@ -23,7 +23,11 @@ import {
   SortDescriptor,
 } from "@nextui-org/react";
 //Iconos
-import { MagnifyingGlassIcon, TicketIcon, UserPlusIcon } from "@heroicons/react/24/solid";
+import {
+  MagnifyingGlassIcon,
+  TicketIcon,
+  UserPlusIcon,
+} from "@heroicons/react/24/solid";
 //Extra
 import { capitalize } from "./Utils";
 /**/
@@ -49,22 +53,27 @@ const INITIAL_VISIBLE_COLUMNS = [
   "IdTicket",
   "Asunto",
   "Descripcion",
-  "Usuario_id",
-  "actions",
+  "Estado",
+  "Prioridad",
+  "Area",
 ];
 export const columnsTicket = [
   { name: "IdTicket", uid: "IdTicket", sortable: true },
   { name: "Asunto", uid: "Asunto", sortable: true },
   { name: "Descripcion", uid: "Descripcion", sortable: true },
-  { name: "Usuario_id", uid: "Usuario_id", sortable: true },
-  { name: "ACTIONS", uid: "actions", sortable: true },
+  { name: "Estado", uid: "Estado", sortable: true },
+  { name: "Fecha Creacion", uid: "FcCreacion", sortable: true },
+  { name: "Prioridad", uid: "Prioridad", sortable: true },
+  { name: "Responsable", uid: "Responsable", sortable: true },
+  { name: "Area", uid: "Area", sortable: true },
+  { name: "Fecha Cierre", uid: "FcCierre", sortable: true },
 ];
 interface Props {
   array: Ticket[];
-  atender:string;
+  atender: string;
 }
 
-export default function TableTicketComponent({ array,atender }: Props) {
+export default function TableTicketComponent({ array, atender }: Props) {
   const [filterValue, setFilterValue] = React.useState("");
   const [selectedKeys, setSelectedKeys] = React.useState<Selection>(
     new Set([])
@@ -105,7 +114,7 @@ export default function TableTicketComponent({ array,atender }: Props) {
       Array.from(statusFilter).length !== statusOptions.length
     ) {
       filteredUsers = filteredUsers.filter((user) =>
-        Array.from(statusFilter).includes(user.Estado)
+        Array.from(statusFilter).includes(user.Estado_id)
       );
     }
 
@@ -129,67 +138,64 @@ export default function TableTicketComponent({ array,atender }: Props) {
     });
   }, [sortDescriptor, items]);
 
-  const renderCell = React.useCallback(
-    (user: Ticket, columnKey: React.Key) => {
-      const cellValue = user[columnKey as keyof Ticket];
+  const renderCell = React.useCallback((user: Ticket, columnKey: React.Key) => {
+    const cellValue = user[columnKey as keyof Ticket];
 
-      switch (columnKey) {
-        case "name":
-          return (
-            <User
-              avatarProps={{ radius: "full", size: "sm", src: user.Descripcion }}
-              classNames={{
-                description: "text-default-500",
-              }}
-              description={user.Descripcion}
-              name={cellValue}
-            >
+    switch (columnKey) {
+      case "name":
+        return (
+          <User
+            avatarProps={{ radius: "full", size: "sm", src: user.Descripcion }}
+            classNames={{
+              description: "text-default-500",
+            }}
+            description={user.Descripcion}
+            name={cellValue}
+          >
+            {user.Descripcion}
+          </User>
+        );
+      case "role":
+        return (
+          <div className="flex flex-col">
+            <p className="text-bold text-small capitalize">{cellValue}</p>
+            <p className="text-bold text-tiny capitalize text-default-500">
               {user.Descripcion}
-            </User>
-          );
-        case "role":
-          return (
-            <div className="flex flex-col">
-              <p className="text-bold text-small capitalize">{cellValue}</p>
-              <p className="text-bold text-tiny capitalize text-default-500">
-                {user.Descripcion}
-              </p>
-            </div>
-          );
-        case "status":
-          return (
-            <Chip
-              className="capitalize border-none gap-1 text-default-600"
-              color={statusColorMap[user.Descripcion]}
-              size="sm"
-              variant="dot"
-            >
-              {cellValue}
-            </Chip>
-          );
-        case "actions":
-          return (
-            <div className="relative flex justify-end items-center gap-2">
-              <Dropdown className="bg-background border-1 border-default-200">
-                <DropdownTrigger>
-                  <Button isIconOnly radius="full" size="sm" variant="light">
-                    <TicketIcon className="h-5" />
-                  </Button>
-                </DropdownTrigger>
-                <DropdownMenu>
-                  <DropdownItem>View</DropdownItem>
-                  <DropdownItem>Edit</DropdownItem>
-                  <DropdownItem>Delete</DropdownItem>
-                </DropdownMenu>
-              </Dropdown>
-            </div>
-          );
-        default:
-          return cellValue;
-      }
-    },
-    []
-  );
+            </p>
+          </div>
+        );
+      case "status":
+        return (
+          <Chip
+            className="capitalize border-none gap-1 text-default-600"
+            color={statusColorMap[user.Descripcion]}
+            size="sm"
+            variant="dot"
+          >
+            {cellValue}
+          </Chip>
+        );
+      case "actions":
+        return (
+          <div className="relative flex justify-end items-center gap-2">
+            <Dropdown className="bg-background border-1 border-default-200">
+              <DropdownTrigger>
+                <Button isIconOnly radius="full" size="sm" variant="light">
+                  <TicketIcon className="h-5" />
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu>
+                <DropdownItem>View</DropdownItem>
+                <DropdownItem>Edit</DropdownItem>
+                <DropdownItem>Delete</DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+          </div>
+        );
+      default:
+        return cellValue;
+    }
+  }, []);
 
   const onRowsPerPageChange = React.useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -227,7 +233,6 @@ export default function TableTicketComponent({ array,atender }: Props) {
             onValueChange={onSearchChange}
           />
           <div className="flex gap-3">
-           
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button
@@ -253,11 +258,7 @@ export default function TableTicketComponent({ array,atender }: Props) {
                 ))}
               </DropdownMenu>
             </Dropdown>
-            {atender === "si" ? (
-              <ModalTicketComponent />
-            ) : (
-              <></>
-            )}
+            {atender === "no" ? <ModalTicketComponent /> : <></>}
           </div>
         </div>
         <div className="flex justify-between items-center">
@@ -352,7 +353,6 @@ export default function TableTicketComponent({ array,atender }: Props) {
         }}
         classNames={classNames}
         selectedKeys={selectedKeys}
-        selectionMode="multiple"
         sortDescriptor={sortDescriptor}
         topContent={topContent}
         topContentPlacement="outside"

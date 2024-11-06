@@ -11,6 +11,7 @@ declare module "next-auth" {
       FcIngreso:string,
       FcBaja:string | null,
       Puesto_id:number,
+      PerfilUsuarios
     } & DefaultSession["user"];
   }
 }

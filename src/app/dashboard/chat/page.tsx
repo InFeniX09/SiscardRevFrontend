@@ -99,9 +99,9 @@ export default function Page() {
   return (
     <>
       <div className="flex h-full overflow-hidden">
-        <div className="w-[30%] h-full bg-yellow-400 overflow-y-scroll overflow-x-hidden p-2">
+        <div className="w-[30%] h-full bg-red-400 overflow-y-scroll overflow-x-hidden p-2">
           {usuario.map((item: any, key: any) => (
-            <div>
+            <div className="hover:bg-red-600 cursor-pointer">
               <User
                 key={key}
                 onClick={() => listarchat(item.IdUsuario)}

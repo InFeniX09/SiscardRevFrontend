@@ -38,14 +38,6 @@ import {
 //Extra
 import { capitalize } from "./Utils";
 /**/
-import ModalTicketComponent from "../Modal/ModalTicket";
-import { SocketContext } from "@/src/context/SocketContext";
-import { useSession } from "next-auth/react";
-import { Solicitud } from "@/src/interfaces/solicitud.interface";
-import ModalSolicitudComponent from "../Modal/ModalSolicitud";
-import ModalAtenderTicketComponent from "../Modal/ModalAtenderTicket";
-import { Equipo } from "@/src/interfaces/equipo.interface";
-import ModalGestionEntidad from "../Modal/ModalCrearUsuario";
 import { TablaUsuario } from "@/src/interfaces/tablausuario";
 import ModalCrearUsuario from "../Modal/ModalCrearUsuario";
 

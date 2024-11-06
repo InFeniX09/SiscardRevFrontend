@@ -23,8 +23,7 @@ import SelectComponent from "../Select/Select";
 import {
   createTicket,
   getlistarArea,
-  getlistarPrioridad,
-  getlistarTicket,
+  getlistarPrioridad
 } from "@/src/actions/centro-atencion";
 //Intefaces
 import { Ticket } from "@/src/interfaces";
@@ -158,7 +157,7 @@ export default function ModalTicketComponent() {
                     value="IdArea"
                     texts={["Area"]}
                     label="Area designada"
-                    placeholder="escoge un area"
+                    placeholder="Escoge un area"
                     prop={{ ...register("idArea", { required: true }) }}
                   />
                   <SelectNormalComponent
@@ -166,7 +165,7 @@ export default function ModalTicketComponent() {
                     value="IdPrioridad"
                     texts={["Prioridad"]}
                     label="Prioridad"
-                    placeholder="seleccione la prioridad"
+                    placeholder="Seleccione la prioridad"
                     prop={{ ...register("idPrioridad", { required: true }) }}
                   />
                 </ModalBody>

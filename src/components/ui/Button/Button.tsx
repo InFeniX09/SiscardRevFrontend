@@ -1,4 +1,4 @@
-import { Button, ButtonGroup } from "@nextui-org/react";
+import { Button } from "@nextui-org/react";
 import { useCallback } from "react";
 
 interface ImageProps {
@@ -11,6 +11,7 @@ export default function ButtonComponent({
   handleGenerarPDF
 }: ImageProps) {
   const onClickHandler = useCallback(() => {
+    
     handleGenerarPDF();
   }, [handleGenerarPDF]);
 
@@ -18,8 +19,7 @@ export default function ButtonComponent({
     <Button
       color="danger"
       className="text-white px-2 overflow-visible"
-      onClick={onClickHandler}
-    >
+      onClick={onClickHandler}>
       {texto}
     </Button>
   );

@@ -100,13 +100,13 @@ export default function TabGestionEquipo() {
             </CardBody>
           </Card>
         </Tab>
-        <Tab key="5" title="EquipoDescuento">
+        {/*<Tab key="5" title="EquipoDescuento">
           <Card>
             <CardBody>
               <TableEquipoDescuentoComponent array={dataequipodescuento} />
             </CardBody>
           </Card>
-        </Tab>
+        </Tab>*/}
       </Tabs>
     </div>
   );

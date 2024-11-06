@@ -38,16 +38,8 @@ import {
 //Extra
 import { capitalize } from "./Utils";
 /**/
-import ModalTicketComponent from "../Modal/ModalTicket";
-import { SocketContext } from "@/src/context/SocketContext";
-import { useSession } from "next-auth/react";
-import { Solicitud } from "@/src/interfaces/solicitud.interface";
-import ModalSolicitudComponent from "../Modal/ModalSolicitud";
-import ModalAtenderTicketComponent from "../Modal/ModalAtenderTicket";
-import { Equipo } from "@/src/interfaces/equipo.interface";
+
 import ModalGestionEntidad from "../Modal/ModalCrearUsuario";
-import { TablaUsuario } from "@/src/interfaces/tablausuario";
-import { TablaMenuAsignado } from "@/src/interfaces/tablamenuasignado";
 import { TablaPerfil } from "@/src/interfaces/tablaperfil";
 
 /**/
@@ -147,6 +139,8 @@ export default function TableMenuAsignado({ array }: Props) {
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
     });
   }, [sortDescriptor, items]);
+
+  console.log(`SORTED ITEMS ${sortedItems}`)
 
   const renderCell = React.useCallback(
     (user: TablaPerfil, columnKey: React.Key) => {

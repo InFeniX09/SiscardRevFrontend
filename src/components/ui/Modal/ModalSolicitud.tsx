@@ -22,37 +22,54 @@ import SelectComponent from "../Select/Select";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 
+interface FormValues {
+  tipomotivo: string;
+  cliente?: string;
+  nombre: string;
+  dni?: string;
+  rol?: string;
+}
+
 export default function ModalSolicitudComponent() {
   const { data: session } = useSession();
   const { socket } = useContext(SocketContext);
   const [tiposolicitud, setTipoSolicitud] = useState<any>([]);
+  const [clientes, setClientes] = useState<any>([]);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [tipomotivo, setTipoMotivo] = useState([]);
   const [selecttiposolicitud, setSelectTipoSolicitud] = useState("");
+  const [showAdditionalInputs, setShowAdditionalInputs] = useState(false);
 
   useEffect(() => {
     socket?.emit("listar-tiposolicitud", null, (tiposolicitud: any) => {
       setTipoSolicitud(tiposolicitud);
     });
+
+    socket?.emit("listar-cliente", null, (datosResponse: any) => {
+      setClientes(datosResponse);
+    });
   }, []);
-  
-  //Formulario
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset: resetSolicitud,
-  } = useForm();
+    reset,
+  } = useForm<FormValues>();
 
-  const onSubmit = async (dato: any) => {
+  const onSubmit = async (datos: FormValues) => {
     const MySwal = withReactContent(Swal);
-    const { tipomotivo } = dato;
     const DeUsuario_id = session?.user.IdUsuario;
     const data = {
       TipoSolicitud_id: selecttiposolicitud,
-      TipoMotivo_id: tipomotivo,
+      TipoMotivo_id: datos.tipomotivo,
       Usuario_id: DeUsuario_id,
+      Cliente_id: datos.cliente,
+      Nombre: datos.nombre,
+      Dni: datos.dni,
+      Rol: datos.rol,
     };
+
     MySwal.fire({
       title: "Crear nueva Solicitud?",
       text: "Se creará un nueva solicitud.",
@@ -65,14 +82,14 @@ export default function ModalSolicitudComponent() {
     }).then((result) => {
       if (result.isConfirmed) {
         socket?.emit("crear-solicitud", data, (solicitud: any) => {
-          if (solicitud.msg === "Existe") {
+          if (solicitud.msg === "HUBO UN ERROR") {
             Swal.fire({
               title: "Creación sin Exito!",
-              text: "La Solicitud ya existe, intente con otros datos.",
+              text: "HUBO UN ERROR",
               icon: "error",
             });
           } else {
-            resetSolicitud();
+            reset();
             Swal.fire({
               title: "Creación Exitosa!",
               text: "Se ha creado un nueva solicitud.",
@@ -86,13 +103,14 @@ export default function ModalSolicitudComponent() {
   const handleSelectChange = async (selectedValue: string) => {
     try {
       setSelectTipoSolicitud(selectedValue);
+      setShowAdditionalInputs(selectedValue === "1"); // Mostrar inputs adicionales si el tipo de solicitud es '1'
+
       const data = {
         TipoSolicitud_id: selectedValue,
       };
       socket?.emit("listar-tipomotivo", data, (tipomotivo: any) => {
         console.log(tipomotivo);
         setTipoMotivo(tipomotivo);
-        console.log("yupi", tipomotivo);
       });
     } catch (error) {
       console.error("Error fetching radiogroup data:", error);
@@ -108,7 +126,12 @@ export default function ModalSolicitudComponent() {
       >
         Crear nueva solicitud
       </Button>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} isDismissable={false} isKeyboardDismissDisabled={true}>
+      <Modal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        isDismissable={false}
+        isKeyboardDismissDisabled={true}
+      >
         <ModalContent>
           {(onClose) => (
             <>
@@ -134,6 +157,39 @@ export default function ModalSolicitudComponent() {
                     placeholder="Seleccione un motivo"
                     prop={{ ...register("tipomotivo", { required: true }) }}
                   />
+                  <Input
+                    type="text"
+                    label="Nombre"
+                    isRequired
+                    {...register("nombre", { required: true })}
+                  />
+
+                  {showAdditionalInputs && (
+                    <>
+                      <Input
+                        type="text"
+                        label="Dni"
+                        isRequired
+                        {...register("dni")}
+                      />
+                      <Input
+                        type="text"
+                        label="Rol"
+                        isRequired
+                        {...register("rol")}
+                      />
+
+                      <SelectNormalComponent
+                        array={clientes}
+                        value="IdCliente"
+                        texts={["CodCliente"]}
+                        label="Cliente"
+                        placeholder="Selecciona un cliente"
+                        prop={{ ...register("cliente", { required: true }) }}
+                      />
+                    </>
+                  )}
+                  
                 </ModalBody>
                 <ModalFooter className="h-full">
                   <Button color="danger" variant="flat" onPress={onClose}>

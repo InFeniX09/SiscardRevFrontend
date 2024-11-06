@@ -67,7 +67,7 @@ export const LoginForm = () => {
           />
           <Link href="/auth/recuperar-clave">No recuerdas tu clave?</Link>
         </div>
-        <div className="flex flex-col align-center items-center gap-3">
+        <div className="flex flex-col md:flex-row align-center items-center gap-3"> 
           <LoginButton></LoginButton>
           <CreateButton></CreateButton>
         </div>
@@ -75,6 +75,7 @@ export const LoginForm = () => {
     </form>
   );
 };
+
 function LoginButton() {
   const { pending } = useFormStatus();
 
@@ -90,7 +91,7 @@ function LoginButton() {
       }
       disabled={pending}
     >
-      Iniciar Sesion
+      Iniciar Sesión
     </button>
   );
 }

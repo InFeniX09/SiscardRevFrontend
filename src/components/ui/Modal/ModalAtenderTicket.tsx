@@ -8,25 +8,21 @@ import {
   ModalFooter,
   Button,
   useDisclosure,
-  Input,
-  Textarea,
   Tooltip,
   Tabs,
   Tab,
   Card,
   CardBody,
-  CheckboxGroup,
-  Checkbox,
 } from "@nextui-org/react";
-import { TicketIcon, UserPlusIcon } from "@heroicons/react/24/solid";
+import { UserPlusIcon } from "@heroicons/react/24/solid";
 import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
-import { toast } from "react-toastify";
 import { SocketContext } from "@/src/context/SocketContext";
-import SelectMultipleComponent from "../Select/SelectMultiple";
 import SelectNormalComponent from "../Select/SelectNormal";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import ButtonPdf from "../Button/ButtonPdf";
+
 interface Props {
   IdSolicitud: number;
 }
@@ -40,117 +36,113 @@ export default function ModalAtenderTicketComponent({ IdSolicitud }: Props) {
     onOpenChange: onOpenChange1,
   } = useDisclosure();
 
-  const [estadocelular, setEstadoCelular] = useState(false);
-  const [estadochip, setEstadoChip] = useState(false);
-  const [estadolaptop, setEstadoLaptop] = useState(false);
-  const [selected, setSelected] = React.useState(["buenos-aires", "sydney"]);
+  const [datospdf, setDatosPdf] = useState<string | null>(null);
+  const [datospdf1, setDatosPdf1] = useState<Blob | null>(null);
 
-  const [equipoaccesorio, setEquipoAccesorio] = useState<any>([]);
-
-  const [equipocelular, setEquipoCelular] = useState<any>([]);
-  const [equipolaptop, setEquipoLaptop] = useState<any>([]);
-  const [equipochip, setEquipoChip] = useState<any>([]);
-  const [accesorio, setAccesorio] = useState<any>([]);
-  const [datospdf, setDatosPdf] = useState<any>();
-  const [datospdf1, setDatosPdf1] = useState<any>();
-
-  const [solicitudxid, setSolicitudXId] = useState<any>([
-    {
-      TipoSolicitud: "",
-      TipoMotivo: "",
-      Usuario: "",
-      IdTipoSolicitud: "",
-      IdTipoMotivo: "",
-    },
-  ]);
-
+  const [solicitudxid, setSolicitudXId] = useState<any[]>([]);
+  const [datosSolicitud, setDatosSolicitud] = useState<any>({});
+  const [celular, setCelular] = useState<any[]>([]);
+  const [laptop, setLaptop] = useState<any[]>([]);
+  const [chip, setChip] = useState<any[]>([]);
+  const [respuesta, setRespuesta] = useState<any[]>([]);
+  const [selectedCelular, setSelectedCelular] = useState<string>("");
+  const [selectedChip, setSelectedChip] = useState<string>("");
+  const [selectedLaptop, setSelectedLaptop] = useState<string>("");
 
   useEffect(() => {
-    if (isOpen1 == true) {
+    if (isOpen1) {
       socket?.emit(
         "listar-solicitudxid",
-        { IdSolicitud: IdSolicitud },
+        { IdSolicitud },
         (solicitudxid: any) => {
           setSolicitudXId(solicitudxid);
-          console.log(solicitudxid[0]);
         }
       );
 
       socket?.emit(
-        "listar-equipoxclasificacion",
-        "",
-        (equipoxclasificacion: any) => {
-          setEquipoAccesorio(equipoxclasificacion);
+        "listar-datos-solicitud",
+        { IdSolicitud },
+        (datosxsolicitud: any) => {
+          setDatosSolicitud(datosxsolicitud);
         }
       );
-      const datacelular = {
-        TipoEquipo: "Celular",
-      };
-      const datalaptop = {
-        TipoEquipo: "Laptop",
-      };
-      const datachip = {
-        TipoEquipo: "Chip",
-      };
-      const dataaccesorio = {
-        TipoEquipo: "Accesorio",
-      };
 
       socket?.emit(
         "listar-equipoxclxtexusu",
-        datacelular,
+        { TipoEquipo: "Celular" },
         (equipoxclasificacion: any) => {
-          console.log("cel", equipoxclasificacion);
-          setEquipoCelular(equipoxclasificacion);
+          setCelular(equipoxclasificacion);
         }
       );
+
       socket?.emit(
         "listar-equipoxclxtexusu",
-        datalaptop,
+        { TipoEquipo: "Chip" },
         (equipoxclasificacion: any) => {
-          setEquipoLaptop(equipoxclasificacion);
+          setChip(equipoxclasificacion);
         }
       );
+
       socket?.emit(
         "listar-equipoxclxtexusu",
-        datachip,
+        { TipoEquipo: "Laptop" },
         (equipoxclasificacion: any) => {
-          setEquipoChip(equipoxclasificacion);
+          setLaptop(equipoxclasificacion);
         }
       );
-      socket?.emit("listar-accesorioxclxtexusu", '', (Accesorio: any) => {
-        setAccesorio(Accesorio);
-        console.log(Accesorio)
-      });
     }
   }, [isOpen1]);
 
-  const { register: rLogicaEquipoStock, handleSubmit: fLogicaEquipoStock } =
-    useForm();
+  const { register, handleSubmit } = useForm();
 
-  const actionLogicaEquipoStock = async (dato: any) => {
+  const onSubmit = async (data: any) => {
+    console.log("celular", selectedCelular)
+    console.log("chip", selectedChip)
+    console.log("laptop", selectedLaptop)
     const usuario_id = session?.user.IdUsuario;
+
     socket?.emit(
-      "armarpdf-solicitud",
+      "asignar-equipos",
       {
-        dato,
-        Solicitud: solicitudxid[0].TipoSolicitud,
-        Motivo: solicitudxid[0].TipoMotivo,
-        usuario_id,
-        Usuario: solicitudxid[0].Usuario,
+        nroSolicitud: IdSolicitud,
+        nroDni: datosSolicitud.Dni,
+        celular: selectedCelular,
+        chip: selectedChip,
+        laptop: selectedLaptop,
       },
-      (datospdf: any) => {
-        const pdfBlob = new Blob([new Uint8Array(datospdf)], {
-          type: "application/pdf",
-        });
-        const pdfURL = URL.createObjectURL(pdfBlob);
-        setDatosPdf(pdfURL);
-        setDatosPdf1(pdfBlob);
+      (response: any) => {
+        setRespuesta(response);
+        if (response.error) {
+          Swal.fire({
+            icon: "error",
+            title: "Hubo un error",
+            text: response.error,
+          });
+        } else {
+          Swal.fire({
+            icon: "success",
+            title: "Good job!",
+            text: "Equipo asignaod con exito",
+          });
+        }
       }
     );
+
+    /*socket?.emit("armarpdf-solicitud", {
+      dato: data,
+      Solicitud: solicitudxid[0]?.TipoSolicitud,
+      Motivo: solicitudxid[0]?.TipoMotivo,
+      usuario_id,
+      Usuario: solicitudxid[0]?.Usuario,
+    }, (datospdf: any) => {
+      const pdfBlob = new Blob([new Uint8Array(datospdf)], { type: "application/pdf" });
+      const pdfURL = URL.createObjectURL(pdfBlob);
+      setDatosPdf(pdfURL);
+      setDatosPdf1(pdfBlob);
+    });*/
   };
 
-  const { register: rEnviarPdf, handleSubmit: fEnviarPdf } = useForm();
+  const armarPdf = async () => {};
 
   const actionEnviarPdf = async () => {
     const MySwal = withReactContent(Swal);
@@ -168,17 +160,33 @@ export default function ModalAtenderTicketComponent({ IdSolicitud }: Props) {
         const data = {
           pdf: datospdf1,
         };
-        socket?.emit("enviarcorreo", data, (datospdf: any) => {
-          console.log(datospdf);
+        socket?.emit("enviarcorreo", data, (response: any) => {
+          console.log(response);
         });
         Swal.fire({
           title: "Exito!",
-          text: "Su solicitud procedio exitosamente.",
+          text: "Su solicitud procedió exitosamente.",
           icon: "success",
         });
       }
     });
   };
+
+  const handleCelularChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCelular(e.target.value);
+  };
+
+  const handleChipChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedChip(e.target.value);
+  };
+
+
+  const handleLaptopChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    console.log(e);
+    setSelectedLaptop(e.target.value);
+  };
+
+
 
   return (
     <>
@@ -191,135 +199,119 @@ export default function ModalAtenderTicketComponent({ IdSolicitud }: Props) {
         aria-label="Modal para atender ticket"
         aria-labelledby="modal-title"
         size="2xl"
-        isDismissable={false}
         className="h-[90vh]"
         classNames={{ wrapper: "overflow-hidden" }}
       >
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1 border-b-2 border-red-400 ">
-                <h1>
-                  Atender solicitud {"==>"} {solicitudxid[0].Usuario}
-                </h1>
+              <ModalHeader className="flex flex-col gap-1">
+                <h1>Atender solicitud: {solicitudxid[0]?.Usuario}</h1>
                 <p className="text-[0.8rem]">
-                  Solicitud: {solicitudxid[0].TipoSolicitud}
+                  Solicitud: {solicitudxid[0]?.TipoSolicitud}
                 </p>
                 <p className="text-[0.8rem]">
-                  Motivo: {solicitudxid[0].TipoMotivo}
+                  Motivo: {solicitudxid[0]?.TipoMotivo}
                 </p>
+                <p className="text-[0.8rem]">DATOS DEL ATENDIDO</p>
+                <div className="flex justify-evenly">
+                  <p className="text-[0.8rem]">
+                    Nombre: {datosSolicitud.Nombre}
+                  </p>
+                  {solicitudxid[0]?.IdTipoSolicitud === 1 && (
+                    <>
+                      <p className="text-[0.8rem]">Dni: {datosSolicitud.Dni}</p>
+                      <p className="text-[0.8rem]">
+                        Rol: {datosSolicitud.Puesto}
+                      </p>
+                    </>
+                  )}
+                </div>
               </ModalHeader>
               <ModalBody className="h-[80%] overflow-auto">
                 <div className="flex w-full flex-col">
-                  {solicitudxid[0].IdTipoSolicitud == 1 &&
-                  solicitudxid[0].IdTipoMotivo == 1 ? (
-                    <Tabs
-                      classNames={{
-                        cursor: "bg-[var(--color-peru)]",
-                        tabList: "bg-white",
-                      }}
-                      disabledKeys={["music"]}
-                      aria-label="Disabled Options"
-                    >
-                      <Tab key="1" title="1er Paso"  className="text-white">
-                        <Card>
-                          <CardBody>
-                            <form>
-                              <h2>Asignando Items</h2>
+                  {solicitudxid[0]?.IdTipoSolicitud === 1 &&
+                    solicitudxid[0]?.IdTipoMotivo === 1 && (
+                      <Card>
+                        <CardBody>
+                          <form onSubmit={handleSubmit(onSubmit)}>
+                            <h2>Asignando Items</h2>
+                            <div>
                               <div>
-                                <div>
+                                {celular.length > 0 ? (
                                   <SelectNormalComponent
-                                    array={equipocelular}
-                                    value="IdEquipoSerie"
-                                    texts={[
-                                      "CodCliente",
-                                      "Marca",
-                                      "Modelo",
-                                      "Serie",
-                                    ]}
+                                    array={celular}
+                                    value="id_equipo"
+                                    texts={["Marca", "Modelo", "equipo_imei"]}
                                     label="Celular"
-                                    placeholder="Seleccionar un cliente"
-                                    prop={{ ...rLogicaEquipoStock(`Celular`) }}
-                                  />
-                                </div>
-                                <div>
-                                  <SelectNormalComponent
-                                    array={equipochip}
-                                    value="IdEquipoSerie"
-                                    texts={[
-                                      "CodCliente",
-                                      "Marca",
-                                      "Modelo",
-                                      "Serie",
-                                    ]}
-                                    label="Chip"
-                                    placeholder="Seleccionar un cliente"
-                                    prop={{ ...rLogicaEquipoStock(`Chip`) }}
-                                  />
-                                </div>
-                                <div>
-                                  <SelectNormalComponent
-                                    array={equipolaptop}
-                                    value="IdEquipoSerie"
-                                    texts={[
-                                      "CodCliente",
-                                      "Marca",
-                                      "Modelo",
-                                      "Serie",
-                                    ]}
-                                    label="Laptop"
-                                    placeholder="Seleccionar un cliente"
-                                    prop={{ ...rLogicaEquipoStock(`Laptop`) }}
-                                  />
-                                </div>
-                                <div>
-                                  <h1>Accesorios</h1>
-                                  <SelectMultipleComponent
-                                    array={accesorio}
-                                    value="IdEquipo"
-                                    texts={["CodCliente", "Marca", "Modelo"]}
-                                    subtexts={[""]}
-                                    label=""
-                                    placeholder="Seleccionar un cliente"
+                                    placeholder="Seleccionar un Telefono"
                                     prop={{
-                                      ...rLogicaEquipoStock(`Accesorio`),
+                                      ...register("Celular"),
+                                      onChange: handleCelularChange,
                                     }}
+
                                   />
-                                </div>
-                              </div>
-                              <Button
-                                onClick={fLogicaEquipoStock(
-                                  actionLogicaEquipoStock
+                                ) : (
+                                  <p>No hay Telefonos disponibles</p>
                                 )}
-                              >
-                                Armar Pdf
-                              </Button>
-                            </form>
-                          </CardBody>
-                        </Card>
-                      </Tab>
-                      <Tab key="2" title="2do Paso"  className="text-white">
-                        <Card>
-                          <CardBody>
-                            <iframe
-                              src={datospdf}
-                              width="100%"
-                              height={400}
-                            ></iframe>
-                            <form>
-                              <Button onClick={fEnviarPdf(actionEnviarPdf)}>
-                                Enviar Pdf a correo
-                              </Button>
-                            </form>
-                          </CardBody>
-                        </Card>
-                      </Tab>
-                    </Tabs>
-                  ) : null}
+                              </div>
+                              <div>
+                                {chip.length > 0 ? (
+                                  <SelectNormalComponent
+                                    array={chip}
+                                    value="id_equipo"
+                                    texts={["Marca", "Modelo", "equipo_imei"]}
+                                    label="Chip"
+                                    placeholder="Seleccionar un Chip"
+                                    prop={{ ...register("Chip"),
+                                      onChange: handleChipChange,
+                                     }}
+                                  />
+                                ) : (
+                                  <p>No hay chips disponibles</p>
+                                )}
+                              </div>
+                              <div>
+                                {laptop.length > 0 ? (
+                                  <SelectNormalComponent
+                                    array={laptop}
+                                    value="id_equipo"
+                                    texts={["Marca", "Modelo", "equipo_imei"]}
+                                    label="Laptop"
+                                    placeholder="Seleccionar una Laptop"
+                                    prop={{ ...register("Laptop"),
+                                      onChange: handleLaptopChange,
+                                     }}
+                                  />
+                                ) : (
+                                  <p>No hay laptops disponibles</p>
+                                )}
+                              </div>
+                            </div>
+                            <ButtonPdf
+                              nombre={datosSolicitud.Nombre}
+                              dni={datosSolicitud.Dni}
+                              rol={datosSolicitud.Puesto}
+                              smartphone={selectedCelular}
+                              chip={selectedChip} laptop={selectedLaptop}
+                            ></ButtonPdf>
+                          </form>
+                        </CardBody>
+                      </Card>
+                    )}
+
+                    {solicitudxid[0]?.IdTipoSolicitud == 2 ?
+                    (<div>
+                      
+                    </div>) :("")
+                    }
                 </div>
               </ModalBody>
-              <ModalFooter className="border-t-2 border-red-400">
-                <Button color="danger" variant="flat" onPress={onClose}>
+              <ModalFooter>
+                <Button type="submit" onClick={handleSubmit(onSubmit)}>
+                  Asignar
+                </Button>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Cerrar
                 </Button>
               </ModalFooter>

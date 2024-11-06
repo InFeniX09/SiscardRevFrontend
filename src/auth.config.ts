@@ -3,6 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import { z } from "zod";
 import axios from "axios";
 import { environment } from "@/src/environments/environment";
+import { User } from "@nextui-org/react";
 
 const api = axios.create({
   baseURL: environment.baseUrl,
@@ -57,18 +58,21 @@ export const authConfig: NextAuthConfig = {
         try {
           const response = await api.post("/auth/buscarUsuario", {
             pUsuario: email,
+            nuevosDatos: {
+              Online: "1",
+            },
           });
-          
+
           const user = response.data.Query3;
 
           if (!user) {
             return null; // Handle invalid credentials
+          } else if (Contrasena !== user.Clave) return null;
+          else {
+            const { Contrasena: _, ...rest } = user; // Remove password from response
+            /**ACTUALIZAR EL ESTADO DEL ONLINE, CUANDO INICIA SESION  */
+            return rest;
           }
-
-          if (Contrasena !== user.Clave) return null;
-
-          const { Contrasena: _, ...rest } = user; // Remove password from response
-          return rest;
         } catch (error) {
           console.error(error);
           return null; // Handle API errors

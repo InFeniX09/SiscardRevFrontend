@@ -11,12 +11,15 @@ import RadiogroupComponent from "@/src/components/ui/Radiogroup/Radiogroup";
 import SelectComponent from "@/src/components/ui/Select/Select";
 import { Card, CardBody, Tab, Tabs } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
+import Swal from "sweetalert2";
+import DownloadExcel from "../Button/Download";
 
 export default function TabDocumentos() {
   const [Albaranes, setAlbaranes] = useState<any>([]);
   const [radiogroupData, setRadiogroupData] = useState<any[]>([]);
   const [selectedGroupValue, setSelectedGroupValue] = useState<string>("");
   const [RadioGroupValue, setRadioGroupValue] = useState<string>("");
+  const [excelData, setExcelData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,25 +54,34 @@ export default function TabDocumentos() {
 
   const handleGenerarPDF = async () => {
     try {
-      const pdetalle = await getlistarDetalleAlbaranSalida(RadioGroupValue);
-      const pdatos = await getlistarDatosPdfAlbaranSalida(selectedGroupValue);
+      if (RadioGroupValue != "") {
+        const pdetalle = await getlistarDetalleAlbaranSalida(RadioGroupValue);
+        const pdatos = await getlistarDatosPdfAlbaranSalida(selectedGroupValue);
 
-      const pdfBytes = await generarpdf(pdatos, pdetalle);
-      const pdfBlob = new Blob([new Uint8Array(pdfBytes.data)], {
-        type: "application/pdf",
-      });
-      const pdfUrl = URL.createObjectURL(pdfBlob);
+        const pdfBytes = await generarpdf(pdatos, pdetalle);
+        const pdfBlob = new Blob([new Uint8Array(pdfBytes.data)], {
+          type: "application/pdf",
+        });
 
-      const link = document.createElement("a");
-      link.href = pdfUrl;
-      link.download = "archivo.pdf";
-      document.body.appendChild(link);
-      link.click();
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+
+        const link = document.createElement("a");
+        link.href = pdfUrl;
+        link.download = selectedGroupValue;
+        document.body.appendChild(link);
+        link.click();
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Tienes que seleccionar una opción",
+        });
+      }
     } catch (error) {
       console.error("Error al generar el PDF:", error);
     }
   };
- 
+
   return (
     <>
       <div className="flex w-full flex-col">
@@ -93,9 +105,16 @@ export default function TabDocumentos() {
                   />
                 </div>
                 <ButtonComponent
-                  texto="GenerarPDF"
+                  texto="Generar PDF"
                   handleGenerarPDF={handleGenerarPDF}
                 />
+              </CardBody>
+            </Card>
+          </Tab>
+          <Tab key="2" title="Reporte SGA">
+            <Card>
+              <CardBody className="flex gap-4">
+                <DownloadExcel></DownloadExcel>
               </CardBody>
             </Card>
           </Tab>

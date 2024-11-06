@@ -22,6 +22,7 @@ import {
   ChipProps,
   SortDescriptor,
   Tooltip,
+  getKeyValue,
 } from "@nextui-org/react";
 //Iconos
 import {
@@ -38,16 +39,7 @@ import {
 //Extra
 import { capitalize } from "./Utils";
 /**/
-import ModalTicketComponent from "../Modal/ModalTicket";
-import { SocketContext } from "@/src/context/SocketContext";
-import { useSession } from "next-auth/react";
-import { Solicitud } from "@/src/interfaces/solicitud.interface";
-import ModalSolicitudComponent from "../Modal/ModalSolicitud";
-import ModalAtenderTicketComponent from "../Modal/ModalAtenderTicket";
-import { Equipo } from "@/src/interfaces/equipo.interface";
 import ModalGestionEntidad from "../Modal/ModalCrearUsuario";
-import { TablaUsuario } from "@/src/interfaces/tablausuario";
-import { TablaMenuAsignado } from "@/src/interfaces/tablamenuasignado";
 import { TablaPerfilUsuario } from "@/src/interfaces/tablaperfilusuario";
 
 /**/
@@ -63,23 +55,17 @@ const statusColorMap: Record<string, ChipProps["color"]> = {
   vacation: "warning",
 };
 
-const INITIAL_VISIBLE_COLUMNS = [
-  "Usuario",
-  "Perfil",
-  "Estado",
-  "actions",
-];
+const INITIAL_VISIBLE_COLUMNS = ["Usuario", "Perfil", "Actions"];
 export const columnsSolicitud = [
   { name: "Usuario", uid: "Usuario", sortable: true },
   { name: "Perfil", uid: "Perfil", sortable: true },
-  { name: "Estado", uid: "Estado", sortable: true },
-  { name: "ACTIONS", uid: "actions", sortable: true },
+  { name: "ACTIONS", uid: "Actions", sortable: true },
 ];
 interface Props {
   array: TablaPerfilUsuario[];
 }
 
-export default function TableMenuAsignado({ array }: Props) {
+export default function TablePerfilUsuario({ array }: Props) {
   const [filterValue, setFilterValue] = React.useState("");
   const [selectedKeys, setSelectedKeys] = React.useState<Selection>(
     new Set([])
@@ -115,9 +101,8 @@ export default function TableMenuAsignado({ array }: Props) {
 
       filteredUsers = filteredUsers.filter(
         (user) =>
-          (user.Perfil &&
-            user.Perfil.toLowerCase().includes(lowerCaseFilterValue))
-         
+          user.Perfil_id &&
+          user.Perfil_id.toLowerCase().includes(lowerCaseFilterValue)
       );
     }
 
@@ -126,7 +111,7 @@ export default function TableMenuAsignado({ array }: Props) {
       Array.from(statusFilter).length !== statusOptions.length
     ) {
       filteredUsers = filteredUsers.filter((user) =>
-        Array.from(statusFilter).includes(user.Perfil)
+        Array.from(statusFilter).includes(user.Perfil_id)
       );
     }
 
@@ -142,30 +127,31 @@ export default function TableMenuAsignado({ array }: Props) {
 
   const sortedItems = React.useMemo(() => {
     return [...items].sort((a: TablaPerfilUsuario, b: TablaPerfilUsuario) => {
-      const first = a[sortDescriptor.column as keyof TablaPerfilUsuario] as number;
-      const second = b[sortDescriptor.column as keyof TablaPerfilUsuario] as number;
+      const first = a[
+        sortDescriptor.column as keyof TablaPerfilUsuario
+      ] as number;
+      const second = b[
+        sortDescriptor.column as keyof TablaPerfilUsuario
+      ] as number;
       const cmp = first < second ? -1 : first > second ? 1 : 0;
-
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
     });
   }, [sortDescriptor, items]);
 
-  const renderCell = React.useCallback(
-    (user: TablaPerfilUsuario, columnKey: React.Key) => {
-      const cellValue = user[columnKey as keyof TablaPerfilUsuario];
+  console.log("SORTERED DATA ", sortedItems);
 
-      switch (columnKey) {
-        
-        case "actions":
-          return <div className="relative flex items-center gap-2"></div>;
-        default:
-          return typeof cellValue === "object" || typeof cellValue === "boolean"
-            ? String(cellValue)
-            : cellValue;
-      }
-    },
-    []
-  );
+  const renderCell = React.useCallback((user: any, columnKey: React.Key) => {
+    const cellValue = user[columnKey as keyof TablaPerfilUsuario];
+
+    switch (columnKey) {
+      case "actions":
+        return <div className="relative flex items-center gap-2"></div>;
+      default:
+        return typeof cellValue === "object" || typeof cellValue === "boolean"
+          ? String(cellValue)
+          : cellValue;
+    }
+  }, []);
 
   const onRowsPerPageChange = React.useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -343,14 +329,14 @@ export default function TableMenuAsignado({ array }: Props) {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody emptyContent={"No users found"} items={sortedItems}>
-          {(item: TablaPerfilUsuario) => (
-            <TableRow key={item.IdPerfilUsuario}>
+        <TableBody emptyContent={"No users found"}>
+          {sortedItems.map((row) => (
+            <TableRow key={row.IdPerfilUsuario}>
               {(columnKey) => (
-                <TableCell>{renderCell(item, columnKey)}</TableCell>
+                <TableCell>{renderCell(row, columnKey)}</TableCell>
               )}
             </TableRow>
-          )}
+          ))}
         </TableBody>
       </Table>
     </>

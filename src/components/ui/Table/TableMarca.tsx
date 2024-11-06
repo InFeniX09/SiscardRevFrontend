@@ -32,12 +32,6 @@ import {
 //Extra
 import { capitalize } from "./Utils";
 /**/
-import ModalTicketComponent from "../Modal/ModalTicket";
-import { SocketContext } from "@/src/context/SocketContext";
-import { useSession } from "next-auth/react";
-import { Solicitud } from "@/src/interfaces/solicitud.interface";
-import ModalSolicitudComponent from "../Modal/ModalSolicitud";
-import ModalAtenderTicketComponent from "../Modal/ModalAtenderTicket";
 import { Marca } from "@/src/interfaces";
 /**/
 
@@ -52,11 +46,10 @@ const statusColorMap: Record<string, ChipProps["color"]> = {
   vacation: "warning",
 };
 
-const INITIAL_VISIBLE_COLUMNS = ["Marca", "TipoEquipo", "Clasificacion"];
+const INITIAL_VISIBLE_COLUMNS = ["Marca", "TipoEquipo.TipoEquipo"];
 export const columnsSolicitud = [
   { name: "Marca", uid: "Marca", sortable: true },
-  { name: "Tipo de Equipo", uid: "TipoEquipo", sortable: true },
-  { name: "Clasificación", uid: "Clasificacion", sortable: true },
+  { name: "Tipo de Equipo", uid: "TipoEquipo.TipoEquipo", sortable: true }
 ];
 interface Props {
   array: Marca[];
@@ -112,7 +105,7 @@ export default function TableMarcaComponent({ array }: Props) {
       Array.from(statusFilter).length !== statusOptions.length
     ) {
       filteredUsers = filteredUsers.filter((user) =>
-        Array.from(statusFilter).includes(user.Estado)
+        Array.from(statusFilter).includes(user.Estado_id)
       );
     }
 
@@ -339,7 +332,6 @@ export default function TableMarcaComponent({ array }: Props) {
         }}
         classNames={classNames}
         selectedKeys={selectedKeys}
-        selectionMode="multiple"
         sortDescriptor={sortDescriptor}
         topContent={topContent}
         topContentPlacement="outside"

@@ -1,9 +1,9 @@
 "use client";
 import { useSession } from "next-auth/react";
+import  Button  from "./ui/prueba"
 
 export default function Page() {
   const { data: session, status } = useSession(); //Usuario
-
   return (
     <>
       <div className="flex gap-3">

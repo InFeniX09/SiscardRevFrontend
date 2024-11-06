@@ -53,21 +53,21 @@ export default function TabGestionStock() {
         selectedKey={selectedTab}
         onSelectionChange={handleTabChange}
       >
-        <Tab key="1" title="EquipoStock">
+        <Tab key="1" title="Equipo Stock">
           <Card>
             <CardBody>
               <TableEquipoStockComponent array={dataequipostock} />
             </CardBody>
           </Card>
         </Tab>
-        <Tab key="2" title="EquipoControl">
+        <Tab key="2" title="Equipo Control">
           <Card>
             <CardBody>
               <TableEquipoControlComponent array={dataequipocontrol} />
             </CardBody>
           </Card>
         </Tab>
-        <Tab key="3" title="EquipoSerie">
+        <Tab key="3" title="Equipo Serie">
           <Card>
             <CardBody>
               <TableEquipoSerieComponent array={dataequiposerie} />

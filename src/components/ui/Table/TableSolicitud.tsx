@@ -28,12 +28,8 @@ import { TicketIcon, UserPlusIcon } from "@heroicons/react/24/solid";
 //Extra
 import { capitalize } from "./Utils";
 /**/
-import ModalTicketComponent from "../Modal/ModalTicket";
-import { SocketContext } from "@/src/context/SocketContext";
-import { useSession } from "next-auth/react";
 import { Solicitud } from "@/src/interfaces/solicitud.interface";
 import ModalSolicitudComponent from "../Modal/ModalSolicitud";
-import ModalAtenderTicketComponent from "../Modal/ModalAtenderTicket";
 /**/
 
 const statusOptions = [
@@ -51,25 +47,22 @@ const INITIAL_VISIBLE_COLUMNS = [
   "IdSolicitud",
   "TipoSolicitud",
   "TipoMotivo",
-  "Usuario",
   "FcCreacion",
-  "Estado",
-  "actions",
+  "Nombre"
 ];
-export const columnsSolicitud = [
-  { name: "#Solicitud", uid: "IdSolicitud", sortable: true },
-  { name: "Solicitud", uid: "TipoSolicitud", sortable: true },
-  { name: "Motivo", uid: "TipoMotivo", sortable: true },
-  { name: "Usuario", uid: "Usuario", sortable: true },
-  { name: "FechaCreacion", uid: "FcCreacion", sortable: true },
-  { name: "Estado", uid: "Estado", sortable: true },
-  { name: "ACTIONS", uid: "actions", sortable: true },
-];
-
 interface Props {
   array: Solicitud[];
   atender: string;
 }
+
+export const columnsSolicitud = [
+  { name: "N° Solicitud", uid: "IdSolicitud", sortable: true },
+  { name: "Solicitud", uid: "TipoSolicitud", sortable: true },
+  { name: "Motivo", uid: "TipoMotivo", sortable: true },
+  { name: "Nombre", uid: "Nombre", sortable: true },
+  { name: "Fecha Creacion", uid: "FcCreacion", sortable: true },
+];
+
 
 export default function TableSolicitudComponent({ array, atender }: Props) {
   const [filterValue, setFilterValue] = React.useState("");
@@ -112,7 +105,7 @@ export default function TableSolicitudComponent({ array, atender }: Props) {
       Array.from(statusFilter).length !== statusOptions.length
     ) {
       filteredUsers = filteredUsers.filter((user) =>
-        Array.from(statusFilter).includes(user.Estado)
+        Array.from(statusFilter).includes(user.Estado_id)
       );
     }
 
@@ -126,6 +119,7 @@ export default function TableSolicitudComponent({ array, atender }: Props) {
     return filteredItems.slice(start, end);
   }, [page, filteredItems, rowsPerPage]);
 
+
   const sortedItems = React.useMemo(() => {
     return [...items].sort((a: Solicitud, b: Solicitud) => {
       const first = a[sortDescriptor.column as keyof Solicitud] as number;
@@ -136,24 +130,25 @@ export default function TableSolicitudComponent({ array, atender }: Props) {
     });
   }, [sortDescriptor, items]);
 
+  const formatDate = (dateString: any) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('es-ES', { // 'es-ES' para formato en español, puedes cambiarlo según necesites
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    });
+  };
+
   const renderCell = React.useCallback(
     (user: Solicitud, columnKey: React.Key) => {
       const cellValue = user[columnKey as keyof Solicitud];
 
       switch (columnKey) {
         case "FcCreacion":
-          return cellValue;
-
-        case "actions":
-          return (
-            <div className="relative flex items-center gap-2">
-              {atender === "si" ? (
-                <ModalAtenderTicketComponent IdSolicitud={user.IdSolicitud} />
-              ) : (
-                <></>
-              )}
-            </div>
-          );
+          return formatDate(cellValue);
         default:
           return cellValue;
       }
@@ -318,7 +313,6 @@ export default function TableSolicitudComponent({ array, atender }: Props) {
         }}
         classNames={classNames}
         selectedKeys={selectedKeys}
-        selectionMode="multiple"
         sortDescriptor={sortDescriptor}
         topContent={topContent}
         topContentPlacement="outside"
