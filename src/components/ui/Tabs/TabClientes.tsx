@@ -1,11 +1,10 @@
 "use client";
-import React, { useContext, useEffect, useState } from "react";
-import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
+import { getListarClientes } from "@/src/actions/pilotaje/guia-clientes";
 import { SocketContext } from "@/src/context/SocketContext";
+import { Card, CardBody, Tab, Tabs } from "@nextui-org/react";
+import { useContext, useEffect, useState } from "react";
 import "react-toastify/dist/ReactToastify.css";
 import TableCliente from "../Table/TableCliente";
-import { getListarClientes, getListarTecnicos } from "@/src/actions/pilotaje/guia-clientes";
-import TableTecnico from "../Table/TableTecnico"
 export default function TabConfiguracionesRecursosHumanos() {
   const { socket } = useContext(SocketContext);
   const [selectedTab, setSelectedTab] = useState(0);
