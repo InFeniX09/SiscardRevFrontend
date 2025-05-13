@@ -44,28 +44,28 @@ export default function TabSearchCargo() {
     socket?.emit("listar-area", "", (res: any[]) => setAreas(res || []));
   }, [socket]);
 
-  const onSelectionChangeZona = (id) => {
+  const onSelectionChangeZona = (id :any) => {
     setZonaSeleccionadaKey(id);
   };
 
-  const onInputChangeZona = (value) => {
+  const onInputChangeZona = (value :any) => {
     setZonaSeleccionadaValue(value);
   };
 
-  const onSelectionChangeArea = (id) => {
+  const onSelectionChangeArea = (id : any) => {
     setAreaSeleccionadaKey(id);
   };
 
-  const onInputChangeArea = (value) => {
+  const onInputChangeArea = (value: any) => {
     setAreaSeleccionadaValue(value);
   };
 
 
-  const onSelectionChangeEstado = (id) => {
+  const onSelectionChangeEstado = (id : any ) => {
     setEstadoSeleccionadoKey(id);
   };
 
-  const onInputChangeEstado = (value) => {
+  const onInputChangeEstado = (value : any) => {
     setEstadoseleccionadoValue(value);
   };
 

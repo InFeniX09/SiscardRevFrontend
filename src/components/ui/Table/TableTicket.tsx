@@ -178,18 +178,18 @@ export default function TableTicketComponent({ array, atender }: Props) {
       case "actions":
         return (
           <div className="relative flex justify-end items-center gap-2">
-            <Dropdown className="bg-background border-1 border-default-200">
+            {/*<Dropdown className="bg-background border-1 border-default-200">
               <DropdownTrigger>
                 <Button isIconOnly radius="full" size="sm" variant="light">
                   <TicketIcon className="h-5" />
                 </Button>
               </DropdownTrigger>
-              <DropdownMenu>
+              {/*<DropdownMenu>
                 <DropdownItem>View</DropdownItem>
                 <DropdownItem>Edit</DropdownItem>
                 <DropdownItem>Delete</DropdownItem>
               </DropdownMenu>
-            </Dropdown>
+            </Dropdown>*/}
           </div>
         );
       default:

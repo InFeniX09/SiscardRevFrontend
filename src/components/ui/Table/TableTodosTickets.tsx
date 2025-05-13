@@ -201,9 +201,9 @@ export default function TableTodosTicketsComponent({ array }: Props) {
                 </Button>
               </DropdownTrigger>
               <DropdownMenu>
-                <DropdownItem>View</DropdownItem>
-                <DropdownItem>Edit</DropdownItem>
-                <DropdownItem>Delete</DropdownItem>
+                <DropdownItem key={""}>View</DropdownItem>
+                <DropdownItem key={""}>Edit</DropdownItem>
+                <DropdownItem key={""}>Delete</DropdownItem>
               </DropdownMenu>
             </Dropdown>
           </div>
