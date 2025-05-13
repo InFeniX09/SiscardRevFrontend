@@ -27,6 +27,7 @@ import { capitalize } from "./Utils";
 /**/
 import { TablaEmpleado } from "@/src/interfaces";
 import ModalCrearEmpleado from "../Modal/ModalCrearEmpleado";
+import { Span } from "next/dist/trace";
 
 /**/
 
@@ -41,11 +42,15 @@ const statusColorMap: Record<string, ChipProps["color"]> = {
   vacation: "warning",
 };
 
-const INITIAL_VISIBLE_COLUMNS = ["Correo", "Telefono", "actions"];
+const INITIAL_VISIBLE_COLUMNS = ["Nombres","Apellidos","FcEmo","bPolicial","actions"];
 export const columnsSolicitud = [
+  { name: "Nombres", uid: "Nombres", sortable: true },
+  { name: "Apellidos", uid: "Apellidos", sortable: true },
+  { name: "Fecha de EMO", uid: "FcEmo", sortable: true },
+  { name: "Validacion Policial", uid: "bPolicial", sortable: true },
   { name: "Correo", uid: "Correo", sortable: true },
   { name: "Telefono", uid: "Telefono", sortable: true },
-  { name: "ACTIONS", uid: "actions", sortable: true },
+  { name: "ACTIONS", uid: "actions", sortable: true }
 ];
 interface Props {
   array: TablaEmpleado[];
@@ -123,12 +128,18 @@ export default function TableEmpleado({ array }: Props) {
   }, [sortDescriptor, items]);
 
   const renderCell = React.useCallback(
-    (user: TablaEmpleado, columnKey: React.Key) => {
+    (user: TablaEmpleado, columnKey: React.Key ) => {
       const cellValue = user[columnKey as keyof TablaEmpleado];
 
       switch (columnKey) {
         case "actions":
-          return <></>;
+          return <><button>a ver</button></>;
+        case "bPolicial":
+          if(user.bPolicial == true){
+            return <><span>OK</span></>;
+          }else{
+            return <><span>INVALIDO</span></>;
+          }
         default:
           return cellValue;
       }
@@ -243,11 +254,6 @@ export default function TableEmpleado({ array }: Props) {
           variant="light"
           onChange={setPage}
         />
-        <span className="text-small text-default-400">
-          {selectedKeys === "all"
-            ? "Todos los items seleccionados"
-            : `${selectedKeys.size} de ${items.length} seleccionados`}
-        </span>
       </div>
     );
   }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
@@ -293,7 +299,6 @@ export default function TableEmpleado({ array }: Props) {
         }}
         classNames={classNames}
         selectedKeys={selectedKeys}
-        selectionMode="multiple"
         sortDescriptor={sortDescriptor}
         topContent={topContent}
         topContentPlacement="outside"

@@ -1,9 +1,9 @@
 "use client";
 import React, { useState } from "react";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
-import { Accordion, AccordionItem, Image } from "@nextui-org/react";
+import { Image } from "@nextui-org/react";
+import {Accordion, AccordionItem} from "@heroui/accordion";
 import {
-  Cog8ToothIcon,
   ComputerDesktopIcon,
   DocumentArrowDownIcon,
   GiftTopIcon,

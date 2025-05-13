@@ -100,6 +100,7 @@ export const Sidebar = ({
             const subItems = menuItems.filter(
               (item) => item.Padre_id === menuItem.IdMenu
             );
+            {/*gestiones*/ }
             return (
               <CollapseItems
                 key={menuItem.IdMenu}

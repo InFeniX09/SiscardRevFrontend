@@ -4,5 +4,7 @@ export interface TablaEmpleado {
     Telefono:string,
     Area_id:number,
     Puesto_id:number,
-    Estado_id:number
+    Estado_id:number,
+    FcEmo: string,
+    bPolicial: boolean
 };

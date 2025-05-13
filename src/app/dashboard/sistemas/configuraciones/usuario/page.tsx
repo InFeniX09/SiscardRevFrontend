@@ -1,11 +1,11 @@
 "use client";
-import TabGestionEntidad from "@/src/components/ui/Tabs/TabGestionEntidad";
+import TabSearchCargo from "@/src/components/ui/Tabs/TabSearchCargo";
 import React from "react";
 
 export default function page() {
   return (
     <>
-      <TabGestionEntidad/>
+      <TabSearchCargo/>
     </>
   );
 } 

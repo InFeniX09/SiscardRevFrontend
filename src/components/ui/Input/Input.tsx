@@ -32,6 +32,8 @@ export default function InputComponent({
           ? "date"
           : tipo === "text"
           ? "text"
+          : tipo === "checkbox" 
+          ? "checkbox"
           : isVisible
           ? "text"
           : "password"

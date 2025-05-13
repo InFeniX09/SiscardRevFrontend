@@ -17,6 +17,8 @@ import {
   CardBody,
   CheckboxGroup,
   Checkbox,
+  DateInput,
+  DatePicker,
 } from "@nextui-org/react";
 import { TicketIcon, UserPlusIcon } from "@heroicons/react/24/solid";
 import { useSession } from "next-auth/react";
@@ -137,7 +139,9 @@ export default function ModalCrearEmpleado() {
             Usuario: dato.Usuario,
             Clave: dato.Clave,
             CorreoCorporativo: dato.CorreoCorporativo,
-            FechaIngreso:dato.FechaIngreso
+            FechaIngreso:dato.FechaIngreso,
+            FcEmo: dato.FcEmo,
+            vPolicial: dato.vPolicial
           },
           (usuario: any) => {
             if (usuario.msg === "Existe") {
@@ -381,6 +385,24 @@ export default function ModalCrearEmpleado() {
                               label="Puesto"
                               placeholder="Seleccione un Puesto"
                               prop={{ ...rCrearEmpleado("Puesto") }}
+                            />
+                          </div>
+                          <div className="flex gap-3  w-full">
+                          <InputComponent
+                              tipo="date"
+                              titulo="Fecha de EMO"
+                              placeholder=""
+                              icon
+                              icon1={"hidden"}
+                              prop={{ ...rCrearEmpleado(`FcEmo`) }}
+                            />
+                            <InputComponent
+                              tipo="checkbox"
+                              titulo="Validacion Policial"
+                              placeholder=""
+                              icon
+                              icon1={"hidden"}
+                              prop={{ ...rCrearEmpleado(`vPolicial`) }}
                             />
                           </div>
                           <Button
