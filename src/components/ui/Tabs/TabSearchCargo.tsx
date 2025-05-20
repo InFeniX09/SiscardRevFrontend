@@ -107,7 +107,7 @@ export default function TabSearchCargo() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = "archivo.pdf";
+      link.download = "CARGO_"+zonaSeleccionadaValue+".pdf";
       document.body.appendChild(link);
       link.click();
       link.remove();
