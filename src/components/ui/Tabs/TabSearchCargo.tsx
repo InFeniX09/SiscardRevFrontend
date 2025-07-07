@@ -16,6 +16,7 @@ import { SocketContext } from "@/src/context/SocketContext";
 import { Equipo } from "@/src/interfaces/equipo.interface";
 import { generarpdfequipos } from "@/src/actions/sistemas/cargo-pdf";
 import { useSession } from "next-auth/react";
+import { set } from "zod";
 
 export default function TabSearchCargo() {
   const { socket } = useContext(SocketContext);
@@ -31,11 +32,16 @@ export default function TabSearchCargo() {
   const [areaSeleccionadaKey, setAreaSeleccionadaKey] = React.useState("");
   const [areaSeleccionadaValue, setAreaSeleccionadaValue] = React.useState("");
 
-    const [estadoseleccionadoKey, setEstadoSeleccionadoKey] = React.useState("");
-  const [estadoseleccionadoValue, setEstadoseleccionadoValue] = React.useState("");
+  const [estadoseleccionadoKey, setEstadoSeleccionadoKey] = React.useState("");
+  const [estadoseleccionadoValue, setEstadoseleccionadoValue] =
+    React.useState("");
 
   const [Comentario, setComentario] = React.useState("");
   const [Mes, setMes] = React.useState("");
+
+  const [estadosPorComponente, setEstadosPorComponente] = useState<{
+    [componenteId: string]: string;
+  }>({});
 
   //const [areaSeleccionada, setAreaSeleccionada] = useState<string>("");
 
@@ -44,15 +50,15 @@ export default function TabSearchCargo() {
     socket?.emit("listar-area", "", (res: any[]) => setAreas(res || []));
   }, [socket]);
 
-  const onSelectionChangeZona = (id :any) => {
+  const onSelectionChangeZona = (id: any) => {
     setZonaSeleccionadaKey(id);
   };
 
-  const onInputChangeZona = (value :any) => {
+  const onInputChangeZona = (value: any) => {
     setZonaSeleccionadaValue(value);
   };
 
-  const onSelectionChangeArea = (id : any) => {
+  const onSelectionChangeArea = (id: any) => {
     setAreaSeleccionadaKey(id);
   };
 
@@ -60,12 +66,11 @@ export default function TabSearchCargo() {
     setAreaSeleccionadaValue(value);
   };
 
-
-  const onSelectionChangeEstado = (id : any ) => {
+  const onSelectionChangeEstado = (id: any) => {
     setEstadoSeleccionadoKey(id);
   };
 
-  const onInputChangeEstado = (value : any) => {
+  const onInputChangeEstado = (value: any) => {
     setEstadoseleccionadoValue(value);
   };
 
@@ -84,6 +89,15 @@ export default function TabSearchCargo() {
   };
 
   const limpiarTodo = () => {
+    setZonaSeleccionadaKey("");
+    setZonaSeleccionadaValue("");
+
+    setAreaSeleccionadaKey("");
+    setAreaSeleccionadaValue("");
+
+    setEstadoSeleccionadoKey("");
+    setEstadoseleccionadoValue("");
+
     setEquipos([]);
     setSeleccionados([]);
     setComentario("");
@@ -103,11 +117,17 @@ export default function TabSearchCargo() {
         session?.user.Usuario,
         estadoseleccionadoValue
       );
+      const hoy = new Date();
+      const dia = String(hoy.getDate()).padStart(2, "0");
+      const mes = String(hoy.getMonth() + 1).padStart(2, "0"); // enero = 0
+      const anio = hoy.getFullYear();
+
       const blob = new Blob([pdf], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = "CARGO_"+zonaSeleccionadaValue+".pdf";
+      const nombreArchivo = `CARGO_${zonaSeleccionadaValue}_${dia}${mes}${anio}.pdf`;
+      link.download = nombreArchivo;
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -134,6 +154,7 @@ export default function TabSearchCargo() {
                 className="max-w-xs"
                 onInputChange={onInputChangeZona}
                 onSelectionChange={onSelectionChangeZona}
+                selectedKey={zonaSeleccionadaKey}
               >
                 {zonas.map((z) => (
                   <AutocompleteItem key={z.zona_id}>
@@ -148,6 +169,7 @@ export default function TabSearchCargo() {
                 className="max-w-xs"
                 onInputChange={onInputChangeArea}
                 onSelectionChange={onSelectionChangeArea}
+                selectedKey={areaSeleccionadaKey}
               >
                 {areas.map((a) => (
                   <AutocompleteItem key={a.Area}>{a.Area}</AutocompleteItem>
@@ -159,11 +181,10 @@ export default function TabSearchCargo() {
                 className="max-w-xs"
                 onInputChange={onInputChangeEstado}
                 onSelectionChange={onSelectionChangeEstado}
+                selectedKey={estadoseleccionadoKey}
               >
-                  <AutocompleteItem key={"NUEVO"}>NUEVO</AutocompleteItem>
-                  <AutocompleteItem key={"USADO"}>USADO</AutocompleteItem>
-
-
+                <AutocompleteItem key={"NUEVO"}>NUEVO</AutocompleteItem>
+                <AutocompleteItem key={"USADO"}>USADO</AutocompleteItem>
               </Autocomplete>
 
               <Button onClick={buscarEquipos} color="danger">
